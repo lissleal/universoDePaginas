@@ -16,11 +16,12 @@ const prodLogger = winston.createLogger({
     level: "info",
     format: winston.format.json(),
     transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: "ERRORS.log", level: "error" }),
+        new winston.transports.File({ filename: "INFO.log", level: "info" }),
+        new winston.transports.File({ filename: "ERRORS.log", level: "error" })
     ],
 });
 
+console.log(process.env.ENV)
 
 const logger = process.env.ENV === "production" ? prodLogger : devLogger;
 

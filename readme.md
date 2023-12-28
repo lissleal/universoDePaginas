@@ -4,9 +4,9 @@ API para un ecommerce de libros
 
 ## Objetivo de esta preentrega
 
-- Aplicar modulo de mocking de productos
-- Aplicar customizador de errores
-- Aplicar diccionario de errores mas comunes
+- Implementacion de logger
+- Definir logger de desarrollo y produccion
+- Crear endpoint para probar logs
 
 ## Iniciar el Proyecto
 
@@ -16,7 +16,7 @@ Para iniciar el proyecto, sigue los siguientes pasos:
 
 npm install
 
-    "@faker-js/faker": "^8.3.1",
+      "@faker-js/faker": "^8.3.1",
     "bcrypt": "^5.1.1",
     "commander": "^11.1.0",
     "connect-mongo": "^5.1.0",
@@ -27,14 +27,16 @@ npm install
     "express-session": "^1.17.3",
     "mongodb-connection-string-url": "^3.0.0",
     "mongoose": "^6.10.0",
+    "mongoose-paginate-v2": "^1.7.4",
     "multer": "^1.4.5-lts.1",
+    "package-name": "^0.1.0",
     "passport": "^0.6.0",
     "passport-github2": "^0.1.12",
     "passport-local": "^1.0.0",
     "session-file-store": "^1.5.0",
     "socket.io": "^4.7.2",
-    "uuid": "^9.0.1"
-    "nodemon": "^3.0.1"
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
 
 2. Inicia el servidor
 
@@ -42,20 +44,21 @@ npm start
 
 ## Aplicaciones agregadas
 
-# Ruta para generar mocking
+# Implementacion de Logger
 
-http://localhost:8080/mockingProducts
+Se utilizó la dependencia Winston
 
-# Diccionario de Errores
+# Logger de Desarrollo
 
-Se creó archivo enums.js con los codigos comunes de errores
-Se creó archivo info.js con los errores comunes en la app
-Se creó archivo customError.js para crear instancias de errores nuevos
-Se actualizaron los archivos users.controllers, cart.controllers y products.controllers para manejar los errores con la nueva instancia
+Logea en consola a partir del nivel debug
 
-# Modificacion de la paginacion actual
+# Logger de Produccion
 
-Se eliminaron las funciones, getProductByLimit, getProductByQuery, getProductByPage y getProductMaster por una unica funcion getProduct(limit, page, sort, query) en todos los archivos de products desde model hasta router.
+Logea en archivo errors.log e info.log a partir del nivel info
+
+# Endpoint para prueba de logs
+
+http://localhost:8080/loggerTest
 
 ## Rutas para interactuar con postman
 
