@@ -1,7 +1,16 @@
 <div class="divproducto">
-
-  <h1>Perfil de {{user.role}}</h1><h3><a href="/api/users/logout">Cerrar sesión</a></h3>
+  <h1>Perfil de Usuario</h1>
+  <p>Usuario de {{user.role}}</p>
   <p>Email: {{user.email}}</p>
+  <a href="/api/users/logout">Cerrar sesión</a>
+
+  {{#if isAuthorized}}
+    <a href="/addProduct"><h2>Cargar un nuevo producto</h2></a>
+    <a href="/manage-products"><h2>Modificar Productos</h2></a>
+  {{/if}}
+  {{#if isAdmin}}
+    <a href="/allusers"><h2>Todos los usuarios</h2></a>
+  {{/if}}
 
 </div>
 

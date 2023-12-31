@@ -46,19 +46,9 @@ npm start
 
 # Implementacion de Logger
 
-Se utilizó la dependencia Winston
+se crean vistas:
 
-# Logger de Desarrollo
-
-Logea en consola a partir del nivel debug
-
-# Logger de Produccion
-
-Logea en archivo errors.log e info.log a partir del nivel info
-
-# Endpoint para prueba de logs
-
-http://localhost:8080/loggerTest
+<!-- Agregar enlace para restablecer la contraseña -->
 
 ## Rutas para interactuar con postman
 

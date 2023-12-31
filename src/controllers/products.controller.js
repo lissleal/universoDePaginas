@@ -143,5 +143,41 @@ export async function deleteProduct(req, res, next) {
     }
 }
 
+export async function manageProducts(req, res, next) {
+    try {
+        let allProducts = await productService.getProducts();
+        console.log("allProducts", allProducts)
+
+        if (!allProducts) {
+            return next(
+                CustomError.createError({
+                    statusCode: 404,
+                    causeKey: "PRODUCTS_NOT_FOUND",
+                    message: "No se encontraron productos"
+                })
+            )
+        }
+        let isAdmin;
+        let isAuthorized;
+        if (req.session.user.role === "admin") {
+            isAdmin = true;
+        }
+        if (req.session.user.role === "admin" || req.session.user.role === "premium") {
+            isAuthorized = true;
+        }
+
+        allProducts = allProducts.docs.map(product => new ProductDTO(product))
+        res.render("manageProducts", {
+            title: "Gestión de Productos",
+            products: allProducts,
+            isAdmin,
+            isAuthorized
+        })
+    } catch (error) {
+        console.error('Error al obtener los productos:', error);
+        res.status(500).json({ error: 'Error al obtener los productos' });
+    }
+}
+
 
 

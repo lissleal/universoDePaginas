@@ -47,24 +47,46 @@ const initializePassport = () => {
     passport.use("login", new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
         try {
             const user = await userService.findEmail({ email: username });
-            console.log("User found:", user);
+            console.log("User found:", user); //CAMBIAR POR LOGGER
 
             if (!user) {
                 return done(null, false, { message: "User not found" });
             }
             const isValid = await isValidPassword(user, password);
-            console.log("Password validation result:", isValid);
+            console.log("Password validation result:", isValid); //CAMBIAR POR LOGGER
 
             if (!isValid) {
                 return done(null, false, { message: "Wrong password" });
             }
-            console.log("Login successful. Authenticated user:", user);
+            console.log("Login successful. Authenticated user:", user); //CAMBIAR POR LOGGER
             return done(null, user);
         } catch (error) {
             console.error("Error in login strategy:", error);
             return done(error);
         }
     }))
+    /*
+        passport.use("changePassword", new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
+            try {
+                const { password } = req.body;
+                console.log(`Nuevo password: ${password}`);
+                let user = await userService.findEmail({ email: username });
+                console.log(`User en passport.change: ${user}`);
+                if (user) {
+                    console.log("User already exists");
+                    return done(null, false, { message: "User already exists" });
+                }
+                const hashedPassword = await createHash(password);
+                const newUser = { password: hashedPassword };
+                console.log("New user:", newUser);
+                let result = await userService.updateUser(newUser);
+                return done(null, result);
+            } catch (error) {
+                console.log("Error changing password:", error);
+                return done("Error changing password", error);
+            }
+        }))
+        */
 
     passport.use("github", new GitHubStrategy({
         clientID: "Iv1.527e35e978c0413e",

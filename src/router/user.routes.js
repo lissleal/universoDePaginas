@@ -2,9 +2,11 @@ import express from "express";
 import passport from "passport";
 import { registerUser, loginUser, logoutUser, handleGitHubCallback } from "../controllers/users.controller.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
-
-
+import UserService from "../services/UserService.js";
+import { createHash } from "../utils.js";
 const UserRouter = express.Router()
+
+const userService = new UserService();
 
 UserRouter.post("/register",
     passport.authenticate("register",
@@ -51,7 +53,7 @@ UserRouter.get("/profile", async (req, res) => {
         })
     }
     catch (error) {
-        console.error("Error en la ruta /profile:", error);
+        req.logger.error("Error en la ruta /profile:", error);
         res.status(500).json(error);
     }
 })
@@ -60,8 +62,9 @@ UserRouter.get("/current", async (req, res) => {
     try {
         let user = req.session.user
 
-        if (!user) {
-            res.redirect("/login")
+        if (!user || user == null || user == undefined) {
+            req.logger.error("No se encontró el usuario")
+            return res.redirect("/login")
         }
         const userData = {
             name: user.name,
@@ -81,11 +84,51 @@ UserRouter.get("/current", async (req, res) => {
         })
     }
     catch (error) {
-        console.error("Error en la ruta /current:", error);
+        req.logger.error("Error en la ruta /current:", error);
         res.status(500).json(error);
     }
 })
 
+UserRouter.get("/allUsers", async (req, res) => {
+    try {
+        let users = await req.db.User.findAll()
+        res.render("users", {
+            title: "Lista de Usuarios",
+            users: users
+        })
+    }
+    catch (error) {
+        req.logger.error("Error en la ruta /allUsers:", error);
+        res.status(500).json(error);
+    }
+})
+
+UserRouter.post("/reset-password", async (req, res) => {
+    try {
+        console.log("entro en el try")
+        const email = req.body.email
+        const password = req.body.password
+        console.log(password)
+        console.log(email)
+        let user = await userService.findEmail({ email: email })
+        console.log(user)
+        if (!user) {
+            req.logger.error("No se encontró el usuario")
+            return res.redirect("/login")
+        }
+
+        const hashedPassword = await createHash(password);
+        console.log(hashedPassword)
+        user.password = hashedPassword
+        await user.save()
+        res.redirect("http://localhost:8080/confirmedReset")
+    }
+    catch (error) {
+        req.logger.error("Error en la ruta /reset-password:", error);
+        res.status(500).json(error);
+    }
+}
+)
 export default UserRouter;
 
 
