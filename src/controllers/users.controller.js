@@ -1,3 +1,11 @@
+import { createHash, comparePasswords } from "../utils.js";
+import mailer from "../config/nodemailer.js";
+import jwt from "jsonwebtoken";
+import UserService from "../services/UserService.js";
+import generatePasswordResetToken from "../config/token.js";
+
+const { sendMail } = mailer;
+const userService = new UserService();
 
 export async function registerUser(req, res, next) {
     try {
@@ -64,6 +72,83 @@ export async function handleGitHubCallback(req, res) {
         res.status(500).json("Error during GitHub authentication");
     }
 }
+
+export async function requestPasswordReset(req, res) {
+    try {
+        const { email } = req.body;
+        const user = await userService.getUserByEmail(email);
+        if (!user) {
+            return res.status(404).json("El usuario no existe");
+        }
+        const resetToken = generatePasswordResetToken({ userId: user.id, email: user.email });
+        const resetUrl = `http://localhost:8080/api/users/createPass/${resetToken}`;
+        const emailOptions = {
+            from: "lissett777@gmail.com",
+            to: email,
+            subject: "Reset Password",
+            html: `<p>Para cambiar tu contraseña, haz click en el siguiente link: <a href="${resetUrl}">${resetUrl}</a></p>
+            <p>Reset token: ${resetToken}</p>`
+        }
+
+        await sendMail(emailOptions);
+        return res.render("confirmedMail", {
+            title: "Reset Mail",
+        });
+    } catch (error) {
+        return res.status(500).json(error.message);
+    }
+
+}
+
+export async function renderPas(req, res) {
+    const token = req.params.token;
+
+    // Decodificar el token y recuperar información adicional
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decoded.email;
+
+    res.render("createPass", {
+        title: "Reset Password",
+        email: email,
+        token: token
+    });
+}
+
+
+
+export async function resetPassword(req, res) {
+    const { password, confirmedPassword } = req.body;
+    const token = req.params.token;
+    if (password !== confirmedPassword) {
+        return res.status(400).json("Las contraseñas no coinciden");
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const email = decoded.email;
+        const user = await userService.getUserByEmail(email);
+        const id = user.id;
+
+        if (!user) {
+            return res.status(404).json("El usuario no existe");
+        }
+
+        if (await comparePasswords(password, user.password)) {
+            return res.status(400).json("La contraseña no puede ser igual a la anterior");
+        }
+        const hashedPassword = await createHash(password);
+        const updatedUser = { password: hashedPassword };
+        await userService.updateUser(id, updatedUser);
+
+        return res.render("confirmedReset", {
+            title: "Reset Password"
+        });
+    } catch (error) {
+        return res.status(500).json(error.message);
+    }
+}
+
+
+
 
 
 
