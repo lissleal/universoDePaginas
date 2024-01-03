@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { registerUser, loginUser, logoutUser, handleGitHubCallback, requestPasswordReset, resetPassword, renderPas } from "../controllers/users.controller.js";
+import { registerUser, loginUser, logoutUser, handleGitHubCallback, requestPasswordReset, resetPassword, renderPas, changeRole } from "../controllers/users.controller.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
 const UserRouter = express.Router()
 
@@ -112,6 +112,9 @@ UserRouter.get("/createPass/:token", renderPas)
 
 // Ruta para enviar correo de recuperacion de contraseña
 UserRouter.post("/createPass/:token", resetPassword)
+
+//Ruta para cambiar el rol del usuario
+UserRouter.post("/premium/:uid", changeRole)
 
 
 

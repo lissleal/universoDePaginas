@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
     stock: { type: Number, required: true },
     thumbnail: { type: String, required: true, max: 100 },
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: "Users",
         default: "admin"
     }

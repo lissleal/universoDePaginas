@@ -73,27 +73,24 @@ export async function getProductById(req, res, next) {
 
 export async function createProduct(req, res, next) {
     try {
-        let { name, description, price, category, stock, thumbnail } = req.body;
-        req.logger.debug("El body es:", req.body)
+        //este permiso esta bien? 
+        if (!req.user.role === 'premium' || !req.user.role === 'admin') {
+            const productData = { ...req.body, owner: req.user._id };
+            req.logger.debug("El body es:", req.body)
 
-        if (!name || !description || !price || !category || !stock || !thumbnail) {
-            return next(
-                CustomError.createError({
-                    statusCode: 404,
-                    causeKey: "PRODUCT_NOT_CREATED",
-                    message: "El producto no se ha podido crear"
-                })
-            )
+            if (!productData.name || !productData.description || !productData.price || !productData.category || !productData.stock || !productData.thumbnail) {
+                return next(
+                    CustomError.createError({
+                        statusCode: 404,
+                        causeKey: "PRODUCT_NOT_CREATED",
+                        message: "El producto no se ha podido crear"
+                    })
+                )
+            }
+            let result = await productService.addProduct(productData);
+
+            res.render(confirmedProduct, { title: "Producto creado", product: result })
         }
-        let result = await productService.addProduct({
-            name,
-            description,
-            price,
-            category,
-            stock,
-            thumbnail
-        })
-        res.send({ result: "success", payload: result })
     } catch (error) {
         console.error('Error al crear el producto:', error);
         res.status(500).json({ error: 'Error al crear el producto' });
@@ -124,8 +121,20 @@ export async function updateProduct(req, res, next) {
 }
 
 export async function deleteProduct(req, res, next) {
+
     try {
         let { pid } = req.params;
+        let user = req.user;
+
+        const product = await productService.getProductById(productId); if (!product) {
+            return res.status(404).send("Producto no encontrado");
+        }
+
+        if (product.owner !== user.email || user.role !== "admin") {
+            return res.status(403).send("Acceso no autorizado. Este producto no te pertenece.");
+        }
+
+
         let result = await productService.deleteProduct(pid);
         if (!result) {
             return next(

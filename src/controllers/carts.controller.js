@@ -134,6 +134,16 @@ export async function getProductsInCart(req, res, next) {
 export async function addProductInCart(req, res, next) {
     const cartId = req.params.cid;
     const productId = req.params.pid;
+    const user = req.user;
+
+    const product = await productService.getProductById(productId);
+    if (!product) {
+        return res.status(404).send("Producto no encontrado");
+    }
+
+    if (product.owner === user.email) {
+        return res.status(403).send("Este producto te pertenece, no puedes agregarlo a tu carro.");
+    }
 
     try {
         const result = await cartService.addProductInCart(cartId, productId);

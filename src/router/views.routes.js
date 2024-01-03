@@ -34,7 +34,7 @@ ViewsRouter.get("/reset", (req, res) => {
 })
 
 
-ViewsRouter.get("/addProducts", authorizeRole("admin"), (req, res) => {
+ViewsRouter.get("/addProducts", authorizeRole(["admin", "premium"]), (req, res) => {
     res.render("addProducts", {
         title: "Agregar Productos"
     })
