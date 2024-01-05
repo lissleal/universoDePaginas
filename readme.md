@@ -82,7 +82,9 @@ Se modifico la funcion addProductsInCart añadiendo comprobacion de que el usuar
 
 # Implementar ruta para cambiar role de user a premium
 
-Se creo ruta POST "api/users/premium/:uid" que utiliza la funcion changeRole para modificar el rol de user a premium y viceversa
+Se creo ruta POST
+http://localhost:8080/api/users/premium/:uid
+Que utiliza la funcion changeRole para modificar el rol de user a premium y viceversa
 
 ## Rutas para interactuar con postman
 
@@ -139,6 +141,10 @@ Contraseña: 1
 
 Usuario Regular
 Email: puser@gmail.com
+Contraseña: 1
+
+Usuario Premium
+Email: upremium@gmail.com
 Contraseña: 1
 
 ## Carritos de Prueba

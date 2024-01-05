@@ -32,11 +32,12 @@ class ProductRepository extends productModel {
     addProduct = async (product) => {
         try {
             const newProduct = new productModel(product);
+            console.log("El newProduct es:", newProduct)
             await newProduct.save();
             return newProduct;
 
         } catch (error) {
-            console.error('Error al guardar el producto:', error);
+            console.error('Error en repository al guardar el producto:', error);
             return null;
         }
     }

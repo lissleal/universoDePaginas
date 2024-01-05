@@ -9,6 +9,10 @@ import dotenv from 'dotenv';
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import loggerMiddleware from "./loggerMiddleware.js";
+import methodOverride from 'method-override';
+
+
+
 
 // Variables de entorno
 dotenv.config();
@@ -39,9 +43,15 @@ app.use(passport.session())
 //Middlewares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(methodOverride('_method'));
+
 
 //Middleware de logger:
 app.use(loggerMiddleware)
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
 
 //Estructura handlebars
 app.engine("handlebars", engine())

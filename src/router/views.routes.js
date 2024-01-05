@@ -48,6 +48,13 @@ ViewsRouter.get("/mockingProducts", async (req, res) => {
     })
 })
 
+ViewsRouter.get("/confirmedProducts", (req, res) => {
+    res.render("confirmedProducts", {
+        title: "Productos Confirmados",
+        products: products
+    })
+})
+
 
 
 

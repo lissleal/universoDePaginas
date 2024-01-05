@@ -150,19 +150,23 @@ export async function resetPassword(req, res) {
 export async function changeRole(req, res) {
     try {
         const { uid } = req.params;
+        console.log("El id del usuario es ", uid);
         const user = await userService.getUserById(uid);
+        console.log("El usuario es ", user);
         if (!user) {
             return res.status(404).json("El usuario no existe");
         }
         let updatedUser;
-        if (user.role === user) {
+        console.log("El rol del usuario es ", user.role);
+        if (user.role === "user") {
             updatedUser = { role: "premium" };
         }
         else {
             updatedUser = { role: "user" };
         }
+        console.log("El usuario actualizado es ", updatedUser);
         await userService.updateUser(uid, updatedUser);
-        return res.redirect("/api/users/allUsers");
+        return res.redirect("/api/users/profile");
     } catch (error) {
         return res.status(500).json(error.message);
     }

@@ -37,21 +37,21 @@ UserRouter.get("/profile", async (req, res) => {
         let user = req.session.user
 
         if (!user || !user.email) {
-            res.redirect("/login")
+            return res.redirect("/login")
         }
         const userData = {
             email: user.email,
             role: user.role,
         }
 
-        res.render("profile", {
+        return res.render("profile", {
             title: "Perfil de Usuario",
             user: userData
         })
     }
     catch (error) {
         req.logger.error("Error en la ruta /profile:", error);
-        res.status(500).json(error);
+        return res.status(500).json(error);
     }
 })
 
@@ -75,28 +75,28 @@ UserRouter.get("/current", async (req, res) => {
 
         const userSafe = new UserDTO(userData).toSafeObject()
 
-        res.render("current", {
+        return res.render("current", {
             title: "Perfil de Usuario",
             user: userSafe
         })
     }
     catch (error) {
         req.logger.error("Error en la ruta /current:", error);
-        res.status(500).json(error);
+        return res.status(500).json(error);
     }
 })
 
 UserRouter.get("/allUsers", async (req, res) => {
     try {
         let users = await req.db.User.findAll()
-        res.render("users", {
+        return res.render("users", {
             title: "Lista de Usuarios",
             users: users
         })
     }
     catch (error) {
         req.logger.error("Error en la ruta /allUsers:", error);
-        res.status(500).json(error);
+        return res.status(500).json(error);
     }
 })
 
@@ -114,7 +114,7 @@ UserRouter.get("/createPass/:token", renderPas)
 UserRouter.post("/createPass/:token", resetPassword)
 
 //Ruta para cambiar el rol del usuario
-UserRouter.post("/premium/:uid", changeRole)
+UserRouter.get("/premium/:uid", changeRole)
 
 
 
