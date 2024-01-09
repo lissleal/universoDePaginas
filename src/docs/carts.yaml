@@ -230,39 +230,41 @@ components:
     Cart:
       type: object
       properties:
-        id:
+        _id:
           type: string
           description: Id del carrito
+        name:
+          type: string
+          description: Nombre del carrito
+        description:
+          type: string
+          description: Descripción del carrito
         products:
           type: array
           description: Productos del carrito
           items:
-            $ref: "#/components/schemas/Product"
-        total:
-          type: number
-          description: Total del carrito
+            type: object
+            properties:
+              productId:
+                type: string
+                format: uuid
+                description: Id del producto
+              quantity:
+                type: number
+                description: Cantidad del producto
+      $ref: "#/components/schemas/Product"
+      example:
+        _id: 5f9d5b9b9d9b9d9b9d9b9d9b
+        name: Carrito 1
+        description: Carrito de compras 1
+        products:
+          - productId: 5f9d5b9b9d9b9d9b9d9b9d9b
+            quantity: 1
+          - productId: 5f9d5b9b9d9b9d9b9d9b9d9b
+            quantity: 2
+
     Carts:
       type: array
       description: Lista de carritos
       items:
         $ref: "#/components/schemas/Cart"
-    Product:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Id del producto
-        name:
-          type: string
-          description: Nombre del producto
-        price:
-          type: number
-          description: Precio del producto
-        quantity:
-          type: number
-          description: Cantidad del producto
-    Products:
-      type: array
-      description: Lista de productos
-      items:
-        $ref: "#/components/schemas/Product"

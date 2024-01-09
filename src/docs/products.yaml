@@ -21,7 +21,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Product"
+              $ref: "#/components/schemas/Products"
   /api/products/manageProducts/:
     get:
       summary: Obtiene todos los productos
@@ -115,38 +115,79 @@ components:
     Product:
       type: object
       properties:
+        _id:
+          type: string
+          description: id del producto autogenerado por mongo
         name:
           type: string
+          description: nombre del producto
         description:
           type: string
+          description: descripción del producto
         price:
           type: number
-        stock:
-          type: number
-        image:
+          description: precio del producto
+        code:
           type: string
+          description: código del producto, debe ser único
         category:
           type: string
-        brand:
+          description: categoría del producto
+        stock:
+          type: number
+          description: stock del producto
+        thumbnail:
           type: string
-        rating:
-          type: number
-        numReviews:
-          type: number
-        countInStock:
-          type: number
-        reviews:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-              rating:
-                type: number
-              comment:
-                type: string
+          description: url de la imagen del producto
+        owner:
+          type: string
+          description: id del usuario que creó el producto
+      example:
+        _id: 60b9b8b9e6b3c3b4b8c9b8b9
+        name: "Producto 1"
+        description: "Descripción del producto 1"
+        price: 100
+        code: "0001"
+        category: "category 1"
+        stock: 10
+        thumbnail: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.es%2Ffotos-vectores-gratis%2"
     Products:
       type: array
       items:
         $ref: "#/components/schemas/Product"
+  requestBodies:
+    updateProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          description: nombre del producto
+        description:
+          type: string
+          description: descripción del producto
+        price:
+          type: number
+          description: precio del producto
+        code:
+          type: string
+          description: código del producto, debe ser único
+        category:
+          type: string
+          description: categoría del producto
+        stock:
+          type: number
+          description: stock del producto
+        thumbnail:
+          type: string
+          description: url de la imagen del producto
+        owner:
+          type: string
+          description: id del usuario que creó el producto
+      example:
+        name: "Producto 1"
+        description: "Descripción del producto 1"
+        price: 100
+        code: "0001"
+        category: "category 1"
+        stock: 10
+        thumbnail: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.es%2Ffotos-vectores-gratis%2"
