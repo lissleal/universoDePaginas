@@ -4,7 +4,7 @@ API para un ecommerce de libros
 
 ## Objetivo de esta preentrega
 
-- Implementar documentación a modulo de productos y carritos
+- Implementar testing a modulo de productos, usuarios y carritos
 
 ## Iniciar el Proyecto
 
@@ -41,16 +41,23 @@ npm install
 "twilio": "^4.20.0",
 "uuid": "^9.0.1",
 "winston": "^3.11.0"
+"devDependencies": {
+"chai": "^4.4.0",
+"mocha": "^10.2.0",
+"nodemon": "^3.0.1",
+"supertest": "^6.3.3"
+}
 
-2. Inicia el servidor
+2. Inicia dos servidores
 
 npm start
+npm run test
 
 ## Aplicaciones agregadas
 
-# Implementar documentación
+# Implementar testing
 
-Por medio de swagger se creo documentacion para los modulos Products y Carts, en la cual se incluyo: - Rutas - Schemas - Ejemplos
+Por medio de mocha se crearon modulos de testing para los modulos Products, Users y Carts.
 
 ## Rutas para interactuar con postman
 
