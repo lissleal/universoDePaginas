@@ -15,7 +15,7 @@ const initializePassport = () => {
             const { name, surname, email, role } = req.body;
             // console.log(`User data: ${name}, ${surname}, ${email}, ${role}`);
             let user = await userService.findEmail({ email: username });
-            // console.log(`User en passport.use /register: ${user}`);
+            console.log(`User en passport.use /register: ${user}`);
             if (user) {
                 console.log("User already exists");
                 return done(null, false, { message: "User already exists" });
@@ -47,7 +47,7 @@ const initializePassport = () => {
     passport.use("login", new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
         try {
             const user = await userService.findEmail({ email: username });
-            // console.log("User found:", user); //CAMBIAR POR LOGGER
+            console.log("User found:", user); //CAMBIAR POR LOGGER
 
             if (!user) {
                 return done(null, false, { message: "User not found" });
@@ -58,6 +58,8 @@ const initializePassport = () => {
             if (!isValid) {
                 return done(null, false, { message: "Wrong password" });
             }
+            user.last_connection = new Date();
+            await userService.updateUser(user._id, user);
             console.log("Login successful. Authenticated user"); //CAMBIAR POR LOGGER
             return done(null, user);
         } catch (error) {

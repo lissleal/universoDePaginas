@@ -28,21 +28,18 @@ export async function registerUser(req, res, next) {
 export async function loginUser(req, res) {
     try {
         let user = req.user
+        req.session.email = user.email
+        req.session.role = user.role
+        req.session.name = user.name
+        req.session.surname = user.surname
+        req.session.age = user.age;
+        req.session.user = user;
+        req.session.last_connection = user.last_connection;
         if (user.role === "admin") {
-            req.session.email = user.email
-            req.session.role = user.role
-            req.session.name = user.name
-            req.session.surname = user.surname
-            req.session.age = user.age;
-            req.session.user = user;
+
             res.redirect("/api/users/profile")
         } else {
-            req.session.email = user.email
-            req.session.role = user.role
-            req.session.name = user.name
-            req.session.surname = user.surname
-            req.session.age = user.age;
-            req.session.user = user;
+
             res.redirect("/api/products")
         }
         req.logger.info("Session established:", req.session.user);
@@ -54,6 +51,11 @@ export async function loginUser(req, res) {
 
 export async function logoutUser(req, res) {
     try {
+        console.log("Entra en logoutUser")
+        let user = req.session.user
+        user.last_connection = new Date();
+        await userService.updateUser(user._id, user);
+        console.log("User logged out:", user.name + " ultima conexion: " + user.last_connection);
         req.session.destroy()
         res.redirect("/login")
     } catch (error) {
