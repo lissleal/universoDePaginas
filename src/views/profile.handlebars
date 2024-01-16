@@ -2,7 +2,9 @@
   <h1>Perfil de Usuario</h1>
   <p>Usuario de {{user.role}}</p>
   <p>Email: {{user.email}}</p>
+  <p>Id: {{user.id}}</p>
   <a href="/api/users/logout">Cerrar sesión</a>
+  <a href="/api/users/premium/{{user.id}}">Cambiar premium/User</a>
 
   {{#if isAuthorized}}
     <a href="/addProduct"><h2>Cargar un nuevo producto</h2></a>

@@ -1,7 +1,9 @@
 import express from "express";
 import passport from "passport";
-import { registerUser, loginUser, logoutUser, handleGitHubCallback, requestPasswordReset, resetPassword, renderPas, changeRole } from "../controllers/users.controller.js";
+import { registerUser, loginUser, logoutUser, handleGitHubCallback, requestPasswordReset, resetPassword, renderPas, changeRole, uploadDocuments } from "../controllers/users.controller.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
+import upload from "../multer.js";
+import uploader from "../multer.js";
 const UserRouter = express.Router()
 
 
@@ -42,6 +44,7 @@ UserRouter.get("/profile", async (req, res) => {
         const userData = {
             email: user.email,
             role: user.role,
+            id: user._id,
         }
 
         return res.render("profile", {
@@ -115,6 +118,9 @@ UserRouter.post("/createPass/:token", resetPassword)
 
 //Ruta para cambiar el rol del usuario
 UserRouter.get("/premium/:uid", changeRole)
+
+//Ruta para subir documentos
+UserRouter.post("/:uid/documents", uploader.array("documents"), uploadDocuments)
 
 
 

@@ -152,26 +152,46 @@ export async function resetPassword(req, res) {
 export async function changeRole(req, res) {
     try {
         const { uid } = req.params;
-        console.log("El id del usuario es ", uid);
+        if (!uid) {
+            return res.status(400).json("El id del usuario es requerido");
+        }
         const user = await userService.getUserById(uid);
-        console.log("El usuario es ", user);
         if (!user) {
             return res.status(404).json("El usuario no existe");
         }
+
         let updatedUser;
-        console.log("El rol del usuario es ", user.role);
-        if (user.role === "user") {
+        const documents = user.documents;
+        const cantidadDocumentos = documents.length;
+        const role = user.role;
+        if (role === "user" && cantidadDocumentos >= 3) {
             updatedUser = { role: "premium" };
+            req.session.user.role = "premium";
+            console.log("El usuario actualizado en session es ", req.session.user.role);
         }
         else {
             updatedUser = { role: "user" };
+            req.session.user.role = "user";
+            console.log("El usuario actualizado en session es ", req.session.user.role);
+
         }
-        console.log("El usuario actualizado es ", updatedUser);
         await userService.updateUser(uid, updatedUser);
         return res.redirect("/api/users/profile");
     } catch (error) {
         return res.status(500).json(error.message);
     }
+}
+
+export async function uploadDocuments(req, res) {
+    if (!req.files) {
+        return res.status(400).send({ status: "error", message: "No se ha subido ningún archivo" });
+    }
+    console.log("Los archivos son ", req.files);
+    let user = req.session.user;
+    console.log("El usuario es ", user);
+    user.documents = req.files;
+    await userService.updateUser(user._id, user);
+    res.send({ status: "success", message: "Archivos subidos correctamente" });
 }
 
 

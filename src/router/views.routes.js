@@ -55,6 +55,12 @@ ViewsRouter.get("/confirmedProducts", (req, res) => {
     })
 })
 
+ViewsRouter.get("/documents", (req, res) => {
+    res.render("upload", {
+        title: "Subir Documentos",
+    })
+})
+
 
 
 

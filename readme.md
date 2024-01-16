@@ -4,7 +4,7 @@ API para un ecommerce de libros
 
 ## Objetivo de esta preentrega
 
-- Implementar testing a modulo de productos, usuarios y carritos
+- Modificar rutas y schema de usuario para permitir la carga de documentos. Agregar propiedad last_connection
 
 ## Iniciar el Proyecto
 
@@ -48,16 +48,28 @@ npm install
 "supertest": "^6.3.3"
 }
 
-2. Inicia dos servidores
+2. Inicia el servidor
 
 npm start
-npm run test
 
 ## Aplicaciones agregadas
 
-# Implementar testing
+# Modificaciones de Schema
 
-Por medio de mocha se crearon modulos de testing para los modulos Products, Users y Carts.
+Se agrego propiedad last_connection la cual se modifica al hacer login y logout
+Se agrego propiedad documents que es un array de documentos
+
+# Carga de documentos
+
+Se utilizó multer para permitir la carga de documentos, se habilito una nueva vista para que el usuario cargue los documentos requeridos
+
+http://localhost:8080/:uid/documents
+
+Se creo archivo multer que contiene la configuracion de multer, los archivos se guardan por separado segun documentacion o imagenes
+
+# Autenticacion de usuarios
+
+Se modifico la ruta http://localhost:8080/api/users/premium/:uid para que unicamente permita que el usuario pase a premium si previamente realizo la carga de documentacion.
 
 ## Rutas para interactuar con postman
 
