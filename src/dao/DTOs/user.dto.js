@@ -8,7 +8,7 @@ export default class UserDTO {
         this.cart = user.cart || [];
         this.role = user.role || "user";
         this.documents = user.documents || [];
-        this.last_connection = user.last_connection || Date.now();
+        this.last_connection = user.last_connection ? new Date(user.last_connection).toLocaleString() : new Date(Date.now()).toLocaleString();
     }
 
     toSafeObject() {

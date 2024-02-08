@@ -121,11 +121,11 @@ http://localhost:8080/api/carts/<cid>/purchase
 ## Usuarios de Prueba
 
 Usuario Admin
-Email: p@gmail.com
+Email: uadmin@gmail.com
 Contraseña: 1
 
-Usuario Regular
-Email: puser@gmail.com
+Usuario Basico
+Email: ubasico@gmail.com
 Contraseña: 1
 
 Usuario Premium

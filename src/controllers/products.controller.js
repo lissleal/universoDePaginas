@@ -3,6 +3,10 @@ import ProductDTO from '../dao/DTOs/product.dto.js';
 import UserDTO from '../dao/DTOs/user.dto.js';
 const productService = new ProductService();
 import CustomError from '../config/customError.js';
+import mailer from "../config/nodemailer.js";
+
+const { sendMail } = mailer;
+
 
 
 export async function getProducts(req, res, next) {
@@ -47,10 +51,15 @@ export async function getProducts(req, res, next) {
 
 export async function getProductById(req, res, next) {
     try {
-        const prodId = req.body.prodId
+        // const prodId = req.body.prodId
+        const prodId = req.body.prodId || req.params.pid;
+        const user = req.user;
+        const cartId = user.cart.cart._id;
         console.log("El prodId es:", prodId)
         console.log("El req.body es:", req.body)
         console.log("El req.params es:", req.params)
+        console.log("El user es:", user)
+        console.log("El cartId es:", cartId)
 
         const prod = await productService.getProductById(prodId);
 
@@ -66,6 +75,7 @@ export async function getProductById(req, res, next) {
         const productDetail = prod.toObject();
         res.render("prod", {
             title: "Detalle de Producto",
+            user,
             product: productDetail
         })
     } catch (error) {
@@ -131,23 +141,27 @@ export async function deleteProduct(req, res, next) {
     try {
         let { pid } = req.params;
         let user = req.user;
-        console.log("El user es:", user)
 
-        const product = await productService.getProductById(pid); if (!product) {
+        const product = await productService.getProductById(pid);
+        if (!product) {
             return res.status(404).send("Producto no encontrado");
         }
-        console.log("El producto.owner es:", product.owner)
-        console.log("El user._idtoString()  es:", user._id.toString())
-        if (product.owner !== user._id.toString() && user.role !== "admin") {
+        let owner = product.owner;
+        let ownerEmail = owner.email;
+        let userId = user._id.toString();
+
+        if (owner !== userId && user.role !== "admin") {
             return res.status(403).send("Acceso no autorizado. Este producto no te pertenece.");
         }
-        // if (user.role !== "admin"){
-        //     return res.status(403).send("Acceso no autorizado. Solo un admin puede eliminar productos que no le pertenecen.");
-        // }
-
-
 
         let result = await productService.deleteProduct(pid);
+        const mailOptions = {
+            from: "email@admin",
+            to: [ownerEmail, "lissett777@gmail.com"],
+            subject: "Producto eliminado",
+            text: `El producto ${product.name} ha sido eliminado`
+        }
+        sendMail(mailOptions);
         if (!result) {
             return next(
                 CustomError.createError({

@@ -1,7 +1,8 @@
+import UserService from "../services/UserService.js";
+import UserDTO from "../dao/DTOs/user.dto.js";
 import { createHash, comparePasswords } from "../utils.js";
 import mailer from "../config/nodemailer.js";
 import jwt from "jsonwebtoken";
-import UserService from "../services/UserService.js";
 import generatePasswordResetToken from "../config/token.js";
 
 const { sendMail } = mailer;
@@ -116,8 +117,6 @@ export async function renderPas(req, res) {
     });
 }
 
-
-
 export async function resetPassword(req, res) {
     const { password, confirmedPassword } = req.body;
     const token = req.params.token;
@@ -194,6 +193,65 @@ export async function uploadDocuments(req, res) {
     res.send({ status: "success", message: "Archivos subidos correctamente" });
 }
 
+export async function requestAllUsers(req, res) {
+    if (req.session.user == undefined || req.session.user.role !== "admin") {
+        return res.status(403).json("No tienes permisos para realizar esta acción");
+    }
+    try {
+        let users = await userService.getUsers();
+        if (!users) {
+            return res.status(404).json("No se encontraron usuarios");
+        }
+        users = users.map(user => new UserDTO(user));
+        return res.render("users", {
+            title: "Lista de Usuarios",
+            users: users
+        })
+    }
+    catch (error) {
+        req.logger.error("Error en la ruta /allUsers:", error);
+        return res.status(500).json(error);
+    }
+}
+
+export async function deleteOldUsers(req, res) {
+    try {
+        const users = await userService.getUsers();
+        console.log("Entre a deleteOldUsers");
+        if (!users) {
+            return res.status(404).json("No se encontraron usuarios");
+        }
+        const currentDate = new Date();
+        const oldUsers = users.filter(user => {
+            const lastConnection = user.last_connection;
+            const diff = currentDate - lastConnection;
+            const days = diff / (1000 * 60 * 60 * 24);
+            return days > 2;
+        });
+        if (oldUsers.length === 0) {
+            return res.status(404).json("No hay usuarios antiguos");
+        }
+        oldUsers.forEach(async user => {
+            let id = user._id;
+            let email = user.email;
+            await userService.deleteUser(id);
+            const emailOptions = {
+                from: "email@admin",
+                to: email,
+                subject: "Cuenta eliminada",
+                html: `<p>Estimado usuario, su cuenta ha sido eliminada por inactividad</p>`
+            };
+            await sendMail(emailOptions);
+            console.log("El usuario con email ", email, " ha sido eliminado");
+        });
+        const ids = oldUsers.map(user => user._id);
+        await userService.deleteUser(ids);
+
+        return res.status(200).json("Usuarios eliminados correctamente");
+    } catch (error) {
+        return res.status(500).json(error.message);
+    }
+}
 
 
 
