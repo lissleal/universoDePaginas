@@ -32,7 +32,6 @@ class ProductRepository extends productModel {
     addProduct = async (product) => {
         try {
             const newProduct = new productModel(product);
-            console.log("El newProduct es:", newProduct)
             await newProduct.save();
             return newProduct;
 

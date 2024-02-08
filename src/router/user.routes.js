@@ -1,9 +1,9 @@
 import express from "express";
 import passport from "passport";
-import { registerUser, loginUser, logoutUser, handleGitHubCallback, requestPasswordReset, resetPassword, renderPas, changeRole } from "../controllers/users.controller.js";
+import { registerUser, loginUser, logoutUser, handleGitHubCallback, requestPasswordReset, resetPassword, renderPas, changeRole, uploadDocuments, requestAllUsers, deleteOldUsers } from "../controllers/users.controller.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
+import uploader from "../multer.js";
 const UserRouter = express.Router()
-
 
 UserRouter.post("/register",
     passport.authenticate("register",
@@ -35,6 +35,7 @@ UserRouter.get("/githubcallback", passport.authenticate("github", { failureRedir
 UserRouter.get("/profile", async (req, res) => {
     try {
         let user = req.session.user
+        console.log("El role es: ", user.role)
 
         if (!user || !user.email) {
             return res.redirect("/login")
@@ -42,11 +43,30 @@ UserRouter.get("/profile", async (req, res) => {
         const userData = {
             email: user.email,
             role: user.role,
+            id: user._id,
         }
+        let isAdmin = false;
+        let isAuthorized = false;
+        console.log("El isAdmin es: ", isAdmin)
+        console.log("El isAuthorized es: ", isAuthorized)
+        console.log("El role es: ", user.role)
+
+        if (user.role === "admin") {
+            isAdmin = true;
+            isAuthorized = true;
+        } else if (user.role === "premium") {
+            isAdmin = false;
+            isAuthorized = true;
+        }
+
+        console.log("El isAdmin es: ", isAdmin)
+        console.log("El isAuthorized es: ", isAuthorized)
 
         return res.render("profile", {
             title: "Perfil de Usuario",
-            user: userData
+            user: userData,
+            isAdmin: isAdmin,
+            isAuthorized: isAuthorized
         })
     }
     catch (error) {
@@ -77,7 +97,8 @@ UserRouter.get("/current", async (req, res) => {
 
         return res.render("current", {
             title: "Perfil de Usuario",
-            user: userSafe
+            user: userSafe,
+
         })
     }
     catch (error) {
@@ -86,21 +107,7 @@ UserRouter.get("/current", async (req, res) => {
     }
 })
 
-UserRouter.get("/allUsers", async (req, res) => {
-    try {
-        let users = await req.db.User.findAll()
-        return res.render("users", {
-            title: "Lista de Usuarios",
-            users: users
-        })
-    }
-    catch (error) {
-        req.logger.error("Error en la ruta /allUsers:", error);
-        return res.status(500).json(error);
-    }
-})
-
-
+UserRouter.get("/allUsers", requestAllUsers)
 
 UserRouter.post("/request-password", requestPasswordReset)
 
@@ -109,13 +116,17 @@ UserRouter.post("/request-password", requestPasswordReset)
 UserRouter.get("/createPass/:token", renderPas)
 
 
-
 // Ruta para enviar correo de recuperacion de contraseña
 UserRouter.post("/createPass/:token", resetPassword)
 
 //Ruta para cambiar el rol del usuario
 UserRouter.get("/premium/:uid", changeRole)
 
+//Ruta para subir documentos
+UserRouter.post("/:uid/documents", uploader.array("documents"), uploadDocuments)
+
+//Ruta Eliminar usuarios
+UserRouter.post("/deleteOldUsers", deleteOldUsers)
 
 
 

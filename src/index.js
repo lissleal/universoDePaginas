@@ -10,6 +10,9 @@ import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import loggerMiddleware from "./loggerMiddleware.js";
 import methodOverride from 'method-override';
+import specs from "./config/swagger.config.js";
+import swaggerUiExpress from "swagger-ui-express";
+
 
 
 
@@ -44,6 +47,7 @@ app.use(passport.session())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'));
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 
 //Middleware de logger:
